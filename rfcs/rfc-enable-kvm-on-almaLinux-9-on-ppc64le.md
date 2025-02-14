@@ -1,6 +1,6 @@
 # RFC: Enable KVM on AlmaLinux 9 on ppc64le
 
-* **RFC Number:** `XXXX` (Assigned by the repository maintainers)
+* **RFC Number:** `0003`
 * **Author(s):** [Lance Albertson](lance@osuosl.org)
 * **Status:** Draft
 * **Created:** [2025-02-14 17:25 UTC]
