@@ -73,7 +73,14 @@ on AlmaLinux 9 for the ppc64le architecture.
 ## Scope
 
 * **Proposal Owners:**
+
+   * Design and guidance on implementation
+   * Patch updates for kernel and QEMU packages
+   * Testing on bare-metal systems
+   * Ongoing maintenance and issues that may come up
 * **Other Developers:**
+
+   * Assistance with ensuring changes made follow AlmaLinux developers guidelines
 * **Policies and guidelines:** N/A
 * **Trademark approval:** N/A
 
