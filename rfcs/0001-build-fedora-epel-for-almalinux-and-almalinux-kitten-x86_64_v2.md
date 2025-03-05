@@ -2,7 +2,7 @@
 
 * **RFC Number:** `0001`
 * **Author(s):** [Jonathan Wright](jonathan@almalinux.org), [Neal Gompa](ngompa@almalinux.org), [Andrew Lukoshko](alukoshko@almalinux.org)
-* **Status:** Draft
+* **Status:** FCP (Final Comment Period)
 * **Created:** [2025-01-29 16:00 UTC]
 * **Updated:** [2025-03-05 15:30 UTC]
 
