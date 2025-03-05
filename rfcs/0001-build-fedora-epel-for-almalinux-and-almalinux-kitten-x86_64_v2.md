@@ -4,7 +4,7 @@
 * **Author(s):** [Jonathan Wright](jonathan@almalinux.org), [Neal Gompa](ngompa@almalinux.org), [Andrew Lukoshko](alukoshko@almalinux.org)
 * **Status:** Draft
 * **Created:** [2025-01-29 16:00 UTC]
-* **Updated:** [2025-01-29 16:00 UTC]
+* **Updated:** [2025-03-05 15:30 UTC]
 
 ## Abstract
 
@@ -24,7 +24,14 @@ Rebuild Fedora's EPEL (Extra Packages for Enterprise Linux) to support x86_64_v2
     * Packages we rebuild and publish will have `.alma_altarch` added to their disttag for easy identification.
     * These packages will use a dedicated GPG signing key - not the base AlmaLinux OS package key.
     * The repository will be an optional rsync target for mirror owners and require them to configure mirroring for it.
-    * EPEL10 will have 2 production branches - one targeting EL10 stable, and one targeting CentOS Stream, or in our case, EL10 stable and Kitten.
+    * Branching has changed in EPEL 10 versus older EPEL releases.  EPEL 10 will be branched for minor releases and have a running `epel10` branch targeting CentOS Stream (and later RHEL 10.10).
+      * The `epel10` branch is used to create builds for the leading EPEL 10 minor version repository. Prior to the CentOS Stream 10 end of life (which corresponds to the end of the RHEL 10 [Full Support Phase](https://access.redhat.com/support/policy/updates/errata#Life_Cycle_Dates)), these builds are built against external repositories of the matching major version of CentOS Stream 10.
+        * These builds will indicate the minor version they are targeting in their [dist tag](https://docs.fedoraproject.org/en-US/packaging-guidelines/DistTag/) using the format of .el10_x, where x is the minor version. They are published in the pub/epel/10 dnf repository for consumption by CentOS Stream 10.
+        * After CentOS Stream 10's end of life, these will be built against RHEL 10.10.
+      * The `epel10.x` branches (where x is the minor version, e.g. epel10.0) are used to create builds for the trailing EPEL 10 minor version repositories. These builds are built against external repositories of the matching minor version of RHEL 10.
+        * These builds will indicate the minor version they are targeting in their [dist tag](https://docs.fedoraproject.org/en-US/packaging-guidelines/DistTag/) using the format of .el10_x, where x is the minor version. They are published in pub/epel/10.x dnf repositories for consumption by the corresponding RHEL 10 minor version.
+      * Source: https://docs.fedoraproject.org/en-US/epel/branches/#_epel_10
+      * We will maintain builds for two branches, `epel10` (for AlmaLinux Kitten) and `epel10.x` for the currently supported AlmaLinux/RHEL release.  `epel10.x` for old minor releases will be moved to vault.
 * **Implementation Plan:** We will ask Fedora Bodhi for the latest built package in stable, grab its SRPM, and build it.  ALBS "platforms" will be used to handle the multiple stable targets.  
 * **Compatibility:** This is a self-contained change proposal.  Usage of this EPEL rebuild would remain optional and be disabled by default - just as upstream EPEL is within AlmaLinux already.
 
