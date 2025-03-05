@@ -21,6 +21,7 @@ Rebuild Fedora's EPEL (Extra Packages for Enterprise Linux) to support x86_64_v2
     * Pull changes/updates from upstream EPEL daily and rebuild the packages.  These built-packages will go into a dedicated repository which users can enable using `dnf install epel-release` just as in current AlmaLinux 8/9.
         * No changes to EPEL packages will be permitted downstream. Any changes needed to build in AlmaLinux for alternative architectures needs to be contributed to Fedora. We will build directly from Fedora SRPMS fetched via Bodhi composes.
     * We got feedback from the EPEL steering committee whose main concern was naming confusion.  We will name the actual package providing the repo `epel-release-almalinux-altarch` and make it `Provides` and `Conflicts` with `epel-release`. This package will only be available in the extras repo for architectures not served by Fedora.
+    * Packages we rebuild and publish will have `.alma_altarch` added to their disttag for easy identification.
     * These packages will use a dedicated GPG signing key - not the base AlmaLinux OS package key.
     * The repository will be an optional rsync target for mirror owners and require them to configure mirroring for it.
     * EPEL10 will have 2 production branches - one targeting EL10 stable, and one targeting CentOS Stream, or in our case, EL10 stable and Kitten.
