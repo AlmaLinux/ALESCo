@@ -47,6 +47,19 @@ For minor issues like bug fixes or small enhancements, please use the appropriat
 6. **Decision Making**: ALESCo votes on the RFC.
 7. **Implementation**: Accepted RFCs are merged and scheduled for implementation.
 
+## AlmaLinux OS Foundation Board input as a blocker
+
+In very rare circumstances the AlmaLinux OS Foundation Board will be required to provide input in things ALESCo is deciding on. In some cases the board may be required to approve a change, and in some cases they can abstain from an official position. However, as part of their oversite in the project, input will be required before a vote can be held in the following situations.
+
+* Input from the board will be a blocking stakeholder before ALESCo can vote on RFCs that...
+   - involve a change to trademarks 
+   - involve a significant increase in needed resources
+   - involve a new or expanded partnership of some kind
+
+To ensure the board provides input, the current board chair will be added as a required reviewer to the pull request. A representative from the board will also attend the meeting where the vote is taking place.
+
+As a note - this is not a veto right, but is only to ensure that the board has been able to advise ALESCo on any potential impacts of changes. 
+
 ## How to Submit an RFC
 
 1. **Fork the Repository**: Click the "Fork" button at the top-right corner of this page to create your own copy of the repository.
