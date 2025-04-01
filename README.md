@@ -41,10 +41,10 @@ For minor issues like bug fixes or small enhancements, please use the appropriat
 
 1. **Proposal Drafting**: Author drafts the RFC using the provided template.
 2. **Submission**: RFC is submitted as a pull request to this repository.
-3. **Public Discussion**: Community and ALESCo members provide feedback.
-4. **Review Period**: A designated period for discussion and revisions.
-5. **Final Comment Period (FCP)**: A last call for comments before the decision.
-6. **Decision Making**: ALESCo reviews and votes on the RFC.
+3. **Accepted for Discussion**: Community and ALESCo members provide feedback, with active revision of the proposal expected. 
+	As part of this step, ALESCo will also send an email to the AlmaLinux OS Foundation board with a link to the RFC pull request, indicating whether or not the board input is expected to be a blocker for the vote.
+5. **Final Comment Period (FCP)**: A last call for comments before the decision. The board will also get a notification of an impending vote here, in case they would like to provide input.
+6. **Decision Making**: ALESCo votes on the RFC.
 7. **Implementation**: Accepted RFCs are merged and scheduled for implementation.
 
 ## How to Submit an RFC
