@@ -49,7 +49,7 @@ For minor issues like bug fixes or small enhancements, please use the appropriat
 
 ## AlmaLinux OS Foundation Board input as a blocker
 
-In very rare circumstances the AlmaLinux OS Foundation Board will be required to provide input in things ALESCo is deciding on. In some cases the board may be required to approve a change, and in some cases they can abstain from an official position. However, as part of their oversite in the project, input will be required before a vote can be held in the following situations.
+In very rare circumstances the AlmaLinux OS Foundation Board will be required to provide input in things ALESCo is deciding on. In some cases the board may be required to approve a change, and in some cases they can abstain from an official position. However, as part of their oversight in the project, input will be required before a vote can be held in the following situations.
 
 * Input from the board will be a blocking stakeholder before ALESCo can vote on RFCs that...
    - involve a change to trademarks 
@@ -109,7 +109,7 @@ By contributing to this repository, you agree that your contributions will be li
 
 ## Contact
 
-* **Chat:** [AlmaLinux MatterMost](https://chat.almalinux.org/~alesco)
+* **Chat:** [AlmaLinux Mattermost](https://chat.almalinux.org/~alesco)
 * **Forums:** [AlmaLinux Community Forums](https://forums.almalinux.org/)
 * **Mailing List:** [devel@lists.almalinux.org](https://lists.almalinux.org/mailman3/lists/devel.lists.almalinux.org/)
 
