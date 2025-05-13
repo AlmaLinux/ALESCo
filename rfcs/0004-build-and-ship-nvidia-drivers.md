@@ -1,6 +1,6 @@
 # RFC: Build NVIDIA Open Source Drivers and Ship Repo Config for AlmaLinux
 
-* **RFC Number:** `0000`
+* **RFC Number:** `0004`
 * **Author(s):** [Jonathan Wright](jonathan@almalinux.org), [Neal Gompa](ngompa@almalinux.org)
 * **Status:** Draft
 * **Created:** [2025-05-07 15:00 UTC]
