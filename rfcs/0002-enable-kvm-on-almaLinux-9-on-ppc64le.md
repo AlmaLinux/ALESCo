@@ -2,7 +2,7 @@
 
 * **RFC Number:** `0002`
 * **Author(s):** [Lance Albertson](lance@osuosl.org)
-* **Status:** Draft
+* **Status:** Accepted
 * **Created:** [2025-02-14 17:25 UTC]
 * **Updated:** [2025-02-14 17:25 UTC]
 
