@@ -2,7 +2,7 @@
 
 * **RFC Number:** `0004`
 * **Author(s):** [Jonathan Wright](jonathan@almalinux.org), [Neal Gompa](ngompa@almalinux.org)
-* **Status:** Draft
+* **Status:** Approved
 * **Created:** [2025-05-07 15:00 UTC]
 * **Updated:** [2025-05-07 15:00 UTC]
 
