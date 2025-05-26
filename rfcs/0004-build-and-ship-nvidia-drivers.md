@@ -40,7 +40,7 @@ AlmaLinux will become more accessible to users of NVIDIA GPUs - from small home 
 * **Proposal Owners:**
   * Design and guidance on implementation
   * Creation of `nvidia-open-kmod` package
-  * Creation of `almalinux-nvidia-driver-release` package
+  * Creation of `almalinux-release-nvidia-driver` package
 * **Other Developers:**
   * Key holders
     * Creation of NVIDIA driver secure boot certificates
