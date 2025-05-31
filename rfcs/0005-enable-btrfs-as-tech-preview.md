@@ -2,7 +2,7 @@
 
 * **RFC Number:** `XXXX` (Assigned by the repository maintainers)
 * **Author(s):** [Michel Lind](michel@meta.com)
-* **Status:** Draft
+* **Status:** Final Comment Period (FCP)
 * **Created:** [YYYY-MM-DD hh:mm UTC]
 * **Updated:** [YYYY-MM-DD hh:mm UTC]
 
