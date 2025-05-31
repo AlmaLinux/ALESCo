@@ -1,6 +1,6 @@
 # RFC: Enable Btrfs as a tech preview
 
-* **RFC Number:** `XXXX` (Assigned by the repository maintainers)
+* **RFC Number:** `0005` (Assigned by the repository maintainers)
 * **Author(s):** [Michel Lind](michel@meta.com)
 * **Status:** Final Comment Period (FCP)
 * **Created:** [YYYY-MM-DD hh:mm UTC]
