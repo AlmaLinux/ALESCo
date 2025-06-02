@@ -2,9 +2,9 @@
 
 * **RFC Number:** `0005` (Assigned by the repository maintainers)
 * **Author(s):** [Michel Lind](michel@meta.com)
-* **Status:** Final Comment Period (FCP)
-* **Created:** [YYYY-MM-DD hh:mm UTC]
-* **Updated:** [YYYY-MM-DD hh:mm UTC]
+* **Status:** Accepted
+* **Created:** [2025-05-08 20:36 UTC]
+* **Updated:** [2025-06-02 21:22 UTC]
 
 ## Abstract
 
@@ -38,7 +38,7 @@ Utilities - apart from `btrfs-progs` which got added to EPEL because of a Golang
   * undo installer changes in Anaconda and its dependencies that disables Btrfs support. Can leverage the CentOS Hyperscale SIG packaging to avoid duplicating work.
   * undo disabled btrfs in various userspace packages
   * import userspace utilities that are needed by Btrfs users
-  
+
 * **Compatibility:** 
 This should not break any compatibility for those not using Btrfs.
 
@@ -80,18 +80,18 @@ Combined with other recent features enabled in AlmaLinux (frame pointers, x86-64
   * Request that Core SIG adds needed packages be pulled into the distribution e.g.
     * btrfs-progs
     * compsize
-    
+
 * **Other Developers:**
   * review and merge PRs
   * import needed new packages, likely from Fedora
-  
+
 * **Policies and guidelines:** N/A
 * **Trademark approval:** N/A
 
 ## Unresolved Questions
 
-* Are all the dependencies to Btrfs enabled already in the EL kernel?
-  * If not, is the extra deviation and implications of that acceptable?
+* ~~Are all the dependencies to Btrfs enabled already in the EL kernel?~~ Yes.
+  * ~~If not, is the extra deviation and implications of that acceptable?~~ N/A
 
 
 ## Acknowledgments
