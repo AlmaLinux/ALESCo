@@ -161,4 +161,4 @@ Voting Issue: Election of a new Chair for ALESCo.
 
 6. **Announcement of Results:**
 
-> "The results are as follows: Member C – 2 votes, Member E – 2 votes, Abstain – 1. With no candidate receiving a majority of the 4 votes cast, no Chair has been elected. The decision is inconclusive and will be revisited in a future vote."
+> "The results are as follows: Member C – 2 votes, Member E – 2 votes, Abstain – 1. With no candidate receiving a majority of the 4 votes cast, no Chair has been elected. The decision is reject and can be revisited in a future vote."
