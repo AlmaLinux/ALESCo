@@ -17,7 +17,7 @@ Below are the procedures ALESCo will follow for all official votes.
 4. The Chair will count the votes.
 5. The Chair will announce the results.
     * If a decision receives more than 50% of the votes cast (excluding abstentions), the decision passes.
-    * If the decision receives 50% or fewer of the votes cast (excluding abstentions), the decision is indecisive and can be voted on in the future.
+    * If the decision receives 50% or fewer of the votes cast (excluding abstentions), the decision is rejected and can be voted on in the future.
 
 # Example Vote
 
@@ -161,4 +161,4 @@ Voting Issue: Election of a new Chair for ALESCo.
 
 6. **Announcement of Results:**
 
-> "The results are as follows: Member C – 2 votes, Member E – 2 votes, Abstain – 1. With no candidate receiving a majority of the 4 votes cast, no Chair has been elected. The decision is reject and can be revisited in a future vote."
+> "The results are as follows: Member C – 2 votes, Member E – 2 votes, Abstain – 1. With no candidate receiving a majority of the 4 votes cast, no Chair has been elected. The decision is inconclusive and will be revisited in a future vote."
