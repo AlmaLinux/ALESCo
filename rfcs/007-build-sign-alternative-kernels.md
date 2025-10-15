@@ -23,7 +23,7 @@ Goals:
 * Import and rebuild the kernel packages from the CentOS Hyperscale SIG and kmods SIG and sign these kernels using the official AlmaLinux Secure Boot key.  
 * Strengthen AlmaLinux's value proposition and reputation by supporting modern hardware while maintaining Enterprise stability.
 
-## **Detailed Design**
+## **Design**
 
 * Proposal Details:   
   We will leverage the existing kernel configurations from the CentOS SIGs and integrate them into the build and signing infrastructure.
@@ -41,6 +41,12 @@ These kernels will be packaged with a distinct name (e.g., kernel-hyperscale-alm
 
 Concern: Every new kernel stream we officially support and sign adds overhead to the build infrastructure  
 Mitigation: The Hyperscale and kmods SIGs are established, high-quality projects. We are leveraging their work rather than creating an entirely new kernel configuration, significantly reducing the testing burden compared to a completely custom kernel, we can limit the number of releases and make explicit that these are experimental kernels i.e. untested. 
+
+### **NVIDIA Kmods***
+
+Concern: NVIDIA drivers will need to be built for each kernel stream, this is already a burdensome task for the existing kitten and 10.0 kernel releases. 
+Mitigation: Either do not support nvidia drivers on these alternative kernels or if it's not too much of a burden, add them to the build trigger.
+
 
 ## **Benefit to AlmaLinux**
 
