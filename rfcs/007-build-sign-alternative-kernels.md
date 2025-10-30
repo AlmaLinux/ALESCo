@@ -25,7 +25,7 @@ Goals:
 
 ## **Design**
 
-* Proposal Details:   
+### Proposal Details:   
   We will leverage the existing kernel configurations from the CentOS SIGs and integrate them into the build and signing infrastructure.
 
 The specific repositories targeted are:
@@ -35,17 +35,19 @@ The specific repositories targeted are:
 
 These kernels will be packaged with a distinct name (e.g., kernel-hyperscale-almalinux) to avoid conflicts with the base EL kernel and will be added to the AlmaLinux Kitten repositories as optional installs. Users will be able to install these kernels and retain Secure Boot integrity, which is a significant advantage over using the SIGs' kernels directly.
 
-## **Drawbacks**
+### Kernel Testing
+
+Kernels should be provided as-is, testing mainline kernels will be met with regressions regulary. It should be on the end-user who is testing to find known-good kernel versions. We cannot reasonably expect working kernels on every new release, these kerenls will be for testing purposes primarily and potentially for Desktop/IoT use with newer hardware, inthese cases we'd expect system administrator to be doing their own testing and pin kernel versions. These are not for "set it and forget it" deployments
+
+## **Concerns**
 
 ### **Increased Maintenance and Testing Burden**
 
-Concern: Every new kernel stream we officially support and sign adds overhead to the build infrastructure  
-Mitigation: The Hyperscale and kmods SIGs are established, high-quality projects. We are leveraging their work rather than creating an entirely new kernel configuration, significantly reducing the testing burden compared to a completely custom kernel, we can limit the number of releases and make explicit that these are experimental kernels i.e. untested. 
+**Every new kernel stream we officially support and sign adds overhead to the build infrastructure** 
+The Hyperscale and kmods SIGs are established, high-quality projects. We are leveraging their work rather than creating an entirely new kernel configuration, significantly reducing the testing burden compared to a completely custom kernel, we can limit the number of releases and make explicit that these are experimental kernels i.e. untested. 
 
-### **NVIDIA Kmods***
-
-Concern: NVIDIA drivers will need to be built for each kernel stream, this is already a burdensome task for the existing kitten and 10.0 kernel releases. 
-Mitigation: Either do not support nvidia drivers on these alternative kernels or if it's not too much of a burden, add them to the build trigger.
+**Will AlmaLinux need to make modifications to the upstream alternative kernels?**
+Both kmods and Hyperscale kernel have BTRFS support and most features we'd wants, it doesn't seems any modification will need to be made, AlmaLinux will be mereley rebuilding and signing them.
 
 
 ## **Benefit to AlmaLinux**
@@ -57,8 +59,8 @@ Mitigation: Either do not support nvidia drivers on these alternative kernels or
 
 **Proposal Owners:**
 
-* AlmaLinux Core Team: Update the build configuration to import SIG sources.  
-* AlmaLinux Infrastructure Team: Configure/expand existing automated kernel build/rebuild/signing pipeline.  
+* AlmaLinux Build System SIG: Update the build configuration to import SIG sources.  
+* AlmaLinux Core SIG: Configure/expand existing automated kernel build/rebuild/signing pipeline.  
 * Others:  
 * Review and test the signed kernels for stability before wide release  
 * Update documentation regarding the installation and support scope for these alternative kernels.
@@ -71,3 +73,5 @@ Mitigation: Either do not support nvidia drivers on these alternative kernels or
 ## **Acknowledgments**
 
 Thanks to the CentOS Hyperscale SIG and kmods SIG contributors for their excellent work in maintaining these alternative kernels.
+
+
