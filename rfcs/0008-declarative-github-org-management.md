@@ -1,6 +1,6 @@
 # RFC: Declarative GitHub Organization Management with Peribolos
 
-* **RFC Number:** `XXXX` (Assigned by the repository maintainers)
+* **RFC Number:** `0008`
 * **Author(s):** [benny Vasquez](benny@almalinux.org)
 * **Status:** Draft
 * **Created:** 2026-04-16 
