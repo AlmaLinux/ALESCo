@@ -82,7 +82,7 @@ Adopt declarative, version-controlled management of the AlmaLinux GitHub organiz
 ## Unresolved Questions
 
 - **Review policy:** Who should be required to approve different types of changes? I'd propose: Team maintainers (SIG leaders, etc) must voice approval on PRs for their team, but are ultimately merged by one of the org admins.
-- **Reconciliation cadence:** If someone makes an emergency change through the UI, should we have a scheduled workflow that detects drift, or is it sufficient to rely on the next PR-triggered run? I think the solution is a daily scheduled job that detects team drift from this repo along with a monthly task that detects individuals being added to repos, and both create issues on the org-managemetn repo and alerts org admins and SIG leaders.
+- **Reconciliation cadence:** If someone makes an emergency change through the UI, should we have a scheduled workflow that detects drift, or is it sufficient to rely on the next PR-triggered run? I think the solution is a daily scheduled job that detects team drift from this repo along with a monthly task that detects individuals being added to repos, and both create issues on the org-management repo and alerts org admins and SIG leaders.
 
 ## Acknowledgments
 
