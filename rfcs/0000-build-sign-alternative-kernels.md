@@ -4,18 +4,19 @@
 * **Author(s):** [Lance Albertson](lance@osuosl.org)
 * **Status:** Draft
 * **Created:** [2026-08-02 18:00 UTC]
-* **Updated:** [2026-08-03 17:00 UTC]
+* **Updated:** [2026-08-16 19:00 UTC]
 
 ## Abstract
 
 This RFC proposes that AlmaLinux rebuild the
 [CentOS Hyperscale SIG kernel](https://sigs.centos.org/hyperscale/contributing/kernel/)
 — a rebuild of the Fedora/`kernel-ark` tree with an Enterprise Linux-shaped
-configuration, currently Linux **7.1.3** — under the distinct package name
-**`kernel-mainline`**, Secure Boot-sign it with AlmaLinux's existing key
-material, and publish it in an opt-in, disabled-by-default repository as a
-**Tech Preview**. It installs alongside the stock Enterprise Linux (EL) kernel,
-never replacing it, and boots with Secure Boot **enabled** — something no
+configuration, currently Linux **7.1.3** — Secure Boot-sign it with
+AlmaLinux's existing key material, and publish it in a dedicated opt-in,
+disabled-by-default repository as a **Tech Preview**. The package keeps the
+name **`kernel`**: enabling the repository opts a system into the
+mainline-based kernel as a full replacement for the stock Enterprise Linux
+(EL) kernel — one that boots with Secure Boot **enabled**, something no
 CentOS SIG kernel or third-party EL kernel can offer today.
 
 This completes work AlmaLinux already started: `kernel-ml`/`kernel-lt`
@@ -70,14 +71,14 @@ the earlier proposal in [PR #15](https://github.com/AlmaLinux/ALESCo/pull/15).
   **no shim change, no Microsoft re-signing, and no new shim review**.
 
 * **Goals:**
-  * Ship a mainline-tracking kernel that installs alongside the stock EL
-    kernel and never displaces it.
+  * Ship a mainline-tracking kernel as an explicit, opt-in replacement for
+    the stock EL kernel, delivered through a dedicated repository.
   * Enable hardware and kernel features that are impractical to backport into
     an EL kernel, particularly on fast-moving architectures such as riscv64.
   * Secure Boot-sign it so it boots with Secure Boot **enabled** where
     technically possible.
-  * Publish it in an opt-in, disabled-by-default repository usable on both
-    AlmaLinux Kitten and stable releases.
+  * Publish it in an opt-in, disabled-by-default repository, initially for
+    AlmaLinux 10 and AlmaLinux Kitten 10.
   * Define a clear Tech Preview support tier, including version-pinning
     guidance and an explicit statement of what is *not* promised.
 
@@ -136,7 +137,7 @@ accepted at shim-review, and the riscv64 port applied the CentOS ISA SIG
 enablement stack.
 
 To keep this from growing into a vendor BSP kernel — the failure mode that
-would genuinely be too much — every carried patch must meet all four criteria:
+would genuinely be too much — every carried patch must meet all three criteria:
 
 1. **Upstream-bound**: a backport of a commit already merged in a later
    mainline release or linux-next, or submitted upstream with a tracking
@@ -149,49 +150,36 @@ would genuinely be too much — every carried patch must meet all four criteria:
 3. **Owned and self-liquidating**: a named owner refreshes it across rebases
    or it is dropped; it is retired automatically once the enablement lands in
    the shipped kernel version.
-4. **Documented** in the package changelog and the "Deviations from RHEL"
-   material, like every other AlmaLinux kernel deviation.
 
 This also gives ALESCo's previously noted need — a process for users to
 request hardware enablement — a concrete answer for this kernel: file the
 request with the patch or upstream submission attached, and the criteria
 above decide it.
 
-### Naming and coexistence
+### Packaging model
 
-Hyperscale ships as package `kernel` and wins by higher EVR — the opposite of
-coexistence. AlmaLinux renames it via `SPECPACKAGE_NAME=kernel-mainline`, the
-documented `kernel-ark` variable Red Hat uses for `kernel-automotive` (~10–15
-spec lines; installed paths key on the kernel release string, so the two
-kernels are naturally disjoint on disk). Coexistence rules:
+The kernel keeps the name **`kernel`** and ships as a full replacement,
+exactly as the Hyperscale SIG packages it: the mainline version is always
+higher than the EL stream version, so on a system with the repository
+enabled, DNF selects it and subsequent updates track it. This keeps the
+packaging delta from Hyperscale near zero — no rename, no subpackage
+surgery — and `perf`, `bpftool`, `kernel-tools` and `kernel-headers` update
+in step with the kernel the same way. Three points stated plainly:
 
-1. **Drop `Provides: kernel = …`** and `Obsoletes: kernel-headers`/
-   `kernel-cross-headers`, so DNF never selects `kernel-mainline` to satisfy a
-   dependency on `kernel`. The uname-scoped provides (`kernel-uname-r`,
-   `kernel-devel-uname-r`, `installonlypkg(kernel)`) are retained — they
-   cannot collide with stock, and running-kernel protection and user module
-   builds depend on them. The trade is deliberate: keeping the provide risks
-   *silently* installing a Tech Preview kernel on supported systems, while
-   dropping it confines breakage to unsupported mainline-only systems as a
-   loud dependency error — and is a one-line revert if the reverse-dependency
-   audit (Unresolved Questions) warrants.
-2. **Disable the unprefixed userspace subpackages** (`perf`, `python3-perf`,
-   `libperf`, `rtla`, `rv`, `kernel-tools`, `kernel-headers`, and related),
-   which own unversioned paths and file-conflict with BaseOS — a defect the
-   2024 prototype shipped. Hyperscale's own builds set the precedent. Newer
-   tools remain available as prefixed companion packages (below).
-3. **Install-only, never the default boot entry.** The stock kernel always
-   remains installed as fallback; silently taking over the boot order (as
-   both ELRepo's and the Kmods SIG's kernels do) is treated as a bug.
-4. **Config baseline:** `CONFIG_SECONDARY_TRUSTED_KEYRING=y` and
+1. **Opting in happens at repository-enable time.** Enabling the repository
+   and updating replaces the kernel and its tool subpackages; this is the
+   intended, documented behavior, not a side effect. Opting back out means
+   disabling the repository and reinstalling the stock kernel.
+2. **Provenance stays visible in the NEVRA.** The release string keeps a
+   distinctive marker (Hyperscale's `.hs` variant-stream pattern or an
+   AlmaLinux equivalent), so `uname -r` and `rpm -q kernel` always show which
+   kernel a system runs — important for bug triage. Previously installed
+   stock kernels remain bootable as older install-only entries until they
+   rotate out of `installonly_limit` retention; documentation will cover how
+   to retain a stock fallback entry.
+3. **Config baseline:** `CONFIG_SECONDARY_TRUSTED_KEYRING=y` and
    `CONFIG_SYSTEM_BLACKLIST_KEYRING=y` must match the stock kernel — the 2024
    prototype regressed both, which breaks MOK-enrolled module loading.
-
-Running `kernel-mainline` exclusively (removing the stock kernel) is
-**permitted but unsupported**: nothing blocks it, matching every distribution
-with parallel kernel streams, but `Requires: kernel` becomes unsatisfiable,
-the tested fallback is gone, and kABI-dependent kmods and Leapp will not work.
-Documentation will recommend keeping a stock kernel installed.
 
 ### Architectures and signing tier
 
@@ -220,7 +208,7 @@ with no CI coverage anywhere).
 
 aarch64 board enablement is a configuration decision, not a given: the
 EL-flavor config targets servers, so supporting SBCs (Raspberry Pi,
-RK3588-family boards) from `kernel-mainline` means deliberately enabling the
+RK3588-family boards) from this kernel means deliberately enabling the
 relevant platform drivers and DTBs, coordinated with the Hyperscale SIG. It
 is worthwhile precisely because that support matures in mainline rather than
 in any EL kernel, but it is scoped as config work, not an automatic property
@@ -230,9 +218,13 @@ of the rebuild.
 
 * A **dedicated signing certificate** under the AlmaLinux Secure Boot CA, per
   the [RFC 0004](0004-build-and-ship-nvidia-drivers.md) precedent — auditable
-  and separable, with no expansion of CA-key access.
-* A **distinct SBAT component**
-  (`kernel-mainline.almalinux,1,AlmaLinux,kernel-mainline,<KVER>,mailto:security@almalinux.org`).
+  and separable, with no expansion of CA-key access. This is the plan pending
+  a validation test that the shim trust chain accepts a new leaf under the
+  embedded CA as anticipated (shim trusts the CA itself rather than any
+  specific leaf); reusing the existing signing certificate is the fallback.
+* A **distinct SBAT component** (e.g.
+  `kernel-mainline.almalinux,1,AlmaLinux,kernel-core,<KVER>,mailto:security@almalinux.org`
+  — the component name is independent of the package name).
   SBAT revocation applies to component *names*: sharing the stock kernel's
   component would let a single lockdown bypass in a Tech Preview kernel force
   a revocation that renders every AlmaLinux kernel unbootable. Entries derived
@@ -256,17 +248,27 @@ A single top-level repository tree serves both Kitten and stable releases.
 AlmaLinux already ships a non-EL kernel exactly this way — the Raspberry Pi
 kernel in its dedicated `raspberrypi` repository — so the pattern is proven.
 
-Version pinning follows the CentOS Kmods SIG's **stream-repository** model:
-administrators pin a known-good series by installing the corresponding release
-package rather than using `versionlock`, making "test and pin a known-good
-version" — the core Tech Preview expectation — an ordinary repository
-operation.
+**Initial scope is AlmaLinux 10 and Kitten 10 only.** AlmaLinux 9 is
+excluded: CentOS Stream 9 — the build target for the Hyperscale EL9 kernel —
+reaches end of life soon, and AlmaLinux 9 is already at the point in its
+lifecycle where, under the expectation stated in Scope, the offering would be
+winding down anyway.
+
+**Cadence is rolling-latest, following the Hyperscale SIG directly.** The SIG
+tracks the Fedora/`kernel-ark` releases (historically a median of about three
+days behind each ark tag), and AlmaLinux rebuilds what the SIG publishes
+rather than maintaining separate longterm streams of its own — the
+lowest-maintenance option, with zero added divergence from the upstream SIG.
+Administrators who need to hold a known-good version use standard DNF
+`versionlock` or excludes, and previously installed kernels remain bootable
+under install-only retention; "test before rolling forward" is the core Tech
+Preview expectation.
 
 ### Companion packages
 
 Rule: ship a companion only if the kernel alone cannot deliver this RFC's
-benefit without it, or if version skew loses real functionality — and name
-what is declined, so scope is a decision rather than an accretion.
+benefit without it — and name what is declined, so scope is a decision rather
+than an accretion.
 
 * **`linux-firmware`, rebuilt in lockstep (drop-in).** A mainline kernel
   enables drivers whose firmware postdates the EL snapshot (new amdgpu ASICs,
@@ -275,11 +277,8 @@ what is declined, so scope is a decision rather than an accretion.
   motivation. Upstream firmware is deliberately additive, and Red Hat itself
   rebases it mid-release. It ships under its stock name — all kernels share
   one `/usr/lib/firmware`, so side-by-side is not meaningful for firmware.
-* **`kernel-mainline-perf` / `kernel-mainline-bpftool` (explicit swap).**
-  Stock tools built from the EL kernel miss newer PMU events and cannot
-  introspect newer BPF program types. These are built from the same SRPM under
-  prefixed names with explicit `Conflicts:` on their stock counterparts;
-  installing one is a deliberate `dnf swap`, never a side effect.
+  The Hyperscale SIG validates the approach: it ships its own Fedora-derived
+  `linux-firmware` rebuild alongside its EL9 kernel.
 * **Declined: `systemd`, `selinux-policy`, `dracut`, `kpatch`.** Hyperscale
   couples its kernel to Fedora backports of the first three; AlmaLinux will
   not. A decade of ELRepo `kernel-ml` on stock dracut shows it unnecessary;
@@ -290,17 +289,19 @@ what is declined, so scope is a decision rather than an accretion.
   downgrading it requires a full relabel, defeating the fallback story. The
   cost of declining `selinux-policy` is stated under Drawbacks.
 
-For users who enable the repository, `linux-firmware` is the **only** package
-that updates without explicit installation; everything else lands only through
-`dnf install` or `dnf swap`.
+Newer `perf`, `bpftool` and `kernel-tools` need no companion treatment under
+the replacement model: they are subpackages of the kernel SRPM and update in
+step with it. Enabling the repository therefore opts a system into the
+kernel, its tool subpackages, and the lockstep `linux-firmware`; nothing
+outside that set is touched.
 
 ### Testing
 
 Release gates, run Kitten-first:
 
-1. **Boot test**, following the Kmods SIG pipeline shape (install
-   `kernel-mainline-core`/`-modules`, reboot, assert `uname -r`); their
-   pipeline already builds against `almalinux-$EL` mock roots.
+1. **Boot test**, following the Kmods SIG pipeline shape (install the
+   repository's `kernel-core`/`kernel-modules`, reboot, assert `uname -r`);
+   their pipeline already builds against `almalinux-$EL` mock roots.
 2. **Structural checks** via `kernel-ark`'s portable `make dist-self-test`.
 3. **A Secure Boot-enabled boot test** — no existing upstream pipeline runs
    one, and it is this kernel's entire value proposition.
@@ -319,25 +320,28 @@ stated plainly.
 
 1. Import the Hyperscale sources into AlmaLinux dist-git and apply the
    standing debranding patch.
-2. Rename via `SPECPACKAGE_NAME=kernel-mainline` and apply the coexistence
-   rules above.
+2. Add the AlmaLinux packaging guard (the analogue of Hyperscale's
+   `centos_hs` conditional), the release-string marker, and the config
+   baseline above.
 3. Wire signing: AlmaLinux certificates, the current `pesign` identity, and
    the dedicated certificate; assert the lockdown and keyring configuration.
-4. Mint the `kernel-mainline` SBAT component.
+4. Mint the distinct SBAT component.
 5. Stand up the repository and release package; populate with the kernel and
    companion packages.
 6. Build and test on Kitten first (the staging precedent ALESCo approved for
-   RFC 0005), then AlmaLinux 10, then AlmaLinux 9.
-7. Publish the Tech Preview support statement and per-architecture tier table
-   alongside the existing "Deviations from RHEL" material.
+   RFC 0005), then AlmaLinux 10.
+7. Publish the Tech Preview support statement, lifecycle expectations and
+   per-architecture tier table in the AlmaLinux documentation.
 8. Disclose the new signed variant at the next shim-review submission.
 
 ### Compatibility
 
-Self-contained and opt-in. Users who never enable the repository are
-unaffected. For users who do, exactly one package changes without explicit
-installation — the lockstep `linux-firmware` — and the stock kernel remains
-the default boot entry and the fallback. Kernel↔userspace couplings are mostly
+Self-contained and opt-in at the repository level. Users who never enable the
+repository are unaffected. Enabling it is the explicit decision to run the
+mainline-based kernel: the kernel, its tool subpackages and the lockstep
+`linux-firmware` then track the repository on normal updates, and previously
+installed stock kernels remain bootable until they rotate out of install-only
+retention. Kernel↔userspace couplings are mostly
 low-risk: netlink userspace (`iproute2`, `ethtool`, `nftables`) is
 forward-compatible by design, and EL SELinux policy permits unknown classes,
 so a newer kernel produces informational messages rather than denials. The
@@ -350,8 +354,7 @@ genuinely coupled areas are listed under Drawbacks.
   symbol dependencies); mainline offers no such stability, the Kmods SIG
   builds NVIDIA kmods only for stock EL kernels, and NVIDIA's open modules
   have needed fixes on essentially every recent mainline release. Explicitly
-  out of scope. (`%kernel_module_package` also cannot currently detect a
-  renamed kernel — follow-on work if ever wanted.)
+  out of scope.
 * **Userspace coupling.** Functionality requiring a newer `systemd` is
   unavailable, and new kernel interfaces run **unconfined** under the older
   SELinux policy — nothing breaks, but confinement coverage silently narrows
@@ -366,8 +369,8 @@ genuinely coupled areas are listed under Drawbacks.
   over `kernel-ark`, which supports downstream flavors (the
   `kernel-automotive` precedent) should AlmaLinux need to rebase directly.
 * **Build, mirror and maintenance cost.** Roughly eight additional full
-  kernel compiles plus debuginfo per release, across Kitten, AlmaLinux 10 and
-  AlmaLinux 9. Bounded by shipping exactly one alternative kernel, per
+  kernel compiles plus debuginfo per release, across Kitten and
+  AlmaLinux 10. Bounded by shipping exactly one alternative kernel, per
   ALESCo's stated constraint; carried enablement patches add rebase work,
   bounded by the owned-and-self-liquidating rule. Real numbers are needed
   from the Build System SIG.
@@ -376,12 +379,14 @@ genuinely coupled areas are listed under Drawbacks.
   test plan above is a deliverable of this RFC, not an assumption.
 * **Expanded signing surface.** A lockdown bypass in a fast-moving kernel is
   a plausible revocation event. Mitigated by the dedicated certificate, the
-  distinct SBAT component (scoping revocation to `kernel-mainline` alone),
+  distinct SBAT component (scoping revocation to the mainline kernel alone),
   and lockdown enforcement as a release gate.
-* **Support-expectation risk.** "Signed by AlmaLinux" may read as "fully
-  supported." Mitigated by the published Tech Preview statement: regressions
-  expected, no kABI, no out-of-tree modules, pin a known-good stream, not for
-  unattended production use.
+* **Support expectations.** As with everything AlmaLinux ships, support is
+  community-based. The published Tech Preview statement sets accurate
+  expectations for a fast-moving kernel: it tracks newer upstream releases,
+  carries no kABI guarantee or out-of-tree module support, and
+  production-sensitive deployments should hold tested versions and roll
+  forward deliberately.
 * **riscv64 ships unsigned** — stated in the tier table rather than glossed;
   riscv64 users lose nothing relative to today.
 
@@ -421,11 +426,15 @@ genuinely coupled areas are listed under Drawbacks.
   * **Secure Boot key holders** — issue the dedicated certificate; update the
     next shim-review submission.
   * **Community and testers** — validate builds and identify known-good
-    streams. **Documentation** — installation instructions, the support
+    versions. **Documentation** — installation instructions, the support
     statement, and the tier table.
 * **Policies and guidelines:** A published Tech Preview support statement
-  (lifecycle, no kABI guarantee, exclusion of out-of-tree modules, per-arch
-  signing tiers, pinning guidance).
+  (community support, as with all AlmaLinux deliverables; no kABI guarantee;
+  exclusion of out-of-tree modules; per-arch signing tiers; pinning
+  guidance). The working lifecycle expectation is that a given major's
+  mainline kernel is maintained for roughly the first 4.5–5 years of that
+  major, ending around the major.9 release, with exact timing (± roughly six
+  months) subject to further discussion.
 * **Trademark approval:** N/A.
 * **Board input:** This touches signing-key handling and may represent a
   significant resource increase; whether
@@ -437,32 +446,27 @@ genuinely coupled areas are listed under Drawbacks.
 * **Build and storage cost** — per-arch build time, builder saturation and
   mirror footprint need real numbers from the Build System SIG (this also
   settles the Board-input question).
-* **Release scope** — Kitten → AlmaLinux 10 → AlmaLinux 9 is proposed; is
-  AlmaLinux 9 worth including, given its older userspace?
-* **Rolling-latest vs. longterm streams** — longterm (~1 disruptive
-  transition/year vs. ~6) fits the Tech Preview tier better; needs a
-  decision.
-* **Default boot entry and `installonly_limit`** — installing
-  `kernel-mainline` must not change the default boot entry; the mechanism,
-  and the interaction of `installonly_limit` with two install-only kernel
-  names, need empirical confirmation.
-* **Mainline-only systems** — audit `Requires: kernel` reverse-dependencies
-  across BaseOS/AppStream/EPEL, and confirm DNF's `protect_running_kernel`
-  keys on the retained `kernel-uname-r` provide; if it instead needs the
-  dropped `Provides: kernel`, a booted `kernel-mainline` could be silently
-  removable — a must-fix before release.
-* **Firmware cadence and packaging shape** — when the lockstep
-  `linux-firmware` rebases, and whether it preserves EL's subpackage split or
-  adopts Fedora's layout (affects upgrade paths in both directions).
+* **Dedicated-certificate validation** — confirm the shim trust chain accepts
+  a new leaf under the embedded CA as anticipated; reusing the existing
+  signing certificate is the fallback if it does not.
+* **Firmware packaging details** — the Hyperscale SIG's own `linux-firmware`
+  rebuild (its `c9s-hs` branch: the Fedora dist-git rebuilt for EL, bumped at
+  each upstream firmware release) is the natural template, settling both
+  cadence and layout. Remaining: confirm the Fedora per-vendor subpackage
+  layout upgrades cleanly over AlmaLinux 10's stock split, and whether Kitten
+  needs the rebuild at all — CentOS Stream keeps its firmware comparatively
+  current, which is why Hyperscale rebuilds firmware only for EL9.
 * **ARM board scope and the Raspberry Pi kernel** — which aarch64 SBC
   platforms the configuration should enable, and the long-term relationship
-  with `raspberrypi2-kernel4`: `kernel-mainline` complements the vendor-fork
-  kernel initially, but the two could converge as mainline Raspberry Pi
-  support matures. The AltArch SIG, which owns the SBC ports, should weigh
-  in — as should it on who adjudicates carried enablement patches against the
-  four criteria (likely the kernel configuration-policy reviewers).
-* **Retirement policy** — the trigger and process for falling back to a
-  direct `kernel-ark` rebase if the upstream SIG stalls.
+  with `raspberrypi2-kernel4`: the mainline kernel complements the
+  vendor-fork kernel initially, but the two could converge as mainline
+  Raspberry Pi support matures. The AltArch SIG, which owns the SBC ports,
+  should weigh in — as should it on who adjudicates carried enablement
+  patches against the three criteria (likely the kernel configuration-policy
+  reviewers).
+* **Upstream stall contingency** — the trigger and process for falling back
+  to a direct `kernel-ark` rebase if the Hyperscale SIG stalls (its release
+  record includes a 7.5-month gap).
 * **Coordination with ELRepo** — their maintainers have publicly offered to
   help; is a formal coordination statement worthwhile to avoid duplicated
   effort and user confusion?
